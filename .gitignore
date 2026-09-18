@@ -1,0 +1,50 @@
+# --- Kiro ---
+# .kiro/specs, .kiro/steering, and .kiro/hooks ARE committed on purpose:
+# they are project artifacts and hackathon evidence.
+# See docs/dual-tool-workflow.md §4.
+.kiro/settings/mcp.json
+.kiro/cache/
+
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# --- Node ---
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Local databases ---
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Editors ---
+.vscode/
+.idea/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
