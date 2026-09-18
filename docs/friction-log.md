@@ -36,6 +36,54 @@ Cover every tool you touch: Kiro, Claude Code, the MCP SDK and spec, Bedrock, Ap
 
 <!-- newest first -->
 
+### [2026-09-18] Alexa+ MCP Toolkit — OAuth 2.0 layer is mandatory but undocumented in the hackathon resources
+
+**Trying to do:** understand how to connect a self-hosted MCP server to Alexa+.
+
+**What happened:** the hackathon Devpost page links to "Alexa+ track" resources but contains no detail on how Alexa+ discovers or authenticates to a self-hosted MCP server. The original developer.amazon.com URLs that seemed relevant (`/en-US/alexa/alexa-plus/`, `/docs/alexa/mcp/`) all return 404. The actual documentation lives under `developer.amazon.com/docs/alexaplus/add-ons/` and was found only through web search.
+
+**What I expected:** the hackathon resources page to link directly to the Alexa+ MCP add-on docs, since "build an MCP server for Alexa+" is the explicit track goal.
+
+**Time lost:** ~20 min of dead-link hunting; the docs themselves, once found, are thorough.
+
+**Workaround:** go directly to `developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-overview.html`.
+
+**Key finding:** Alexa+ requires full OAuth 2.0/2.1 — `/.well-known/oauth-authorization-server` (RFC 8414), `/.well-known/oauth-protected-resource` (RFC 9728), M2M `client_credentials` for catalog calls, PKCE `authorization_code` for user-level tool calls. No API key or static token option. This is significant scope that has to be designed in from the start; discovering it late would require rearchitecting the entire auth layer.
+
+**Would fix by:** the Devpost track description should link directly to `developer.amazon.com/docs/alexaplus/add-ons/`. Even a single sentence — "your server must implement the Alexa+ MCP add-on spec at [URL]" — would save every hackathon team this search.
+
+---
+
+### [2026-09-18] Alexa+ MCP Toolkit — tool discovery is snapshot-on-deploy, not live
+
+**Trying to do:** understand whether adding a new MCP tool requires a server restart or a full re-registration.
+
+**What happened:** documentation states: "If you modify tools, configurations, or other MCP server details, redeploy your add-on with `alexa-ai deploy`. Alexa+ refreshes tool information only on deployment." This means every tool change requires an explicit `alexa-ai deploy` run — it is not sufficient to deploy new server code.
+
+**What I expected:** Alexa+ to call `tools/list` on demand or periodically.
+
+**Time lost:** 0 (found in docs before hitting it in practice).
+
+**Workaround:** treat `alexa-ai deploy` as a required step in the deployment pipeline alongside `docker push` and App Runner update. The `addon-package/addon.json` file must be kept in version control and redeployed on any tool addition or rename.
+
+**Would fix by:** nothing to fix — the behaviour is correct and the docs describe it clearly. Worth noting in the deployment runbook so teammates don't deploy server code and wonder why new tools aren't showing up.
+
+---
+
+### [2026-09-18] Amazon Bedrock — "Model access" page retired; per-account enablement is now automatic
+
+**Trying to do:** enable Claude on Bedrock for this account following the documented manual process.
+
+**What happened:** navigating to the Bedrock console's "Model access" page shows a banner: "Model access page has been retired. Serverless foundation models are now automatically enabled across all AWS commercial regions when first invoked in your account."
+
+**What I expected:** to go through the documented request-and-wait flow for Anthropic models (the docs and most tutorials still describe this process).
+
+**Time lost:** 0 (the console banner is clear).
+
+**Impact on project:** Bedrock access is no longer a day-1 blocking item. The `spike_bedrock.py` script can be run immediately after configuring AWS credentials — no wait required. Note: the banner says first-time Anthropic use "may need to submit use case details before they can access the model" — this appears to be account-state-dependent; it did not trigger on this account.
+
+**Would fix by:** update any tutorial or onboarding docs that still describe the manual model enablement flow. The Bedrock getting-started guide still leads with the old process as of this writing.
+
 ### [2026-09-18] MCP Python SDK — `CallToolResult` field is snake_case while the wire format is camelCase
 
 **Trying to do:** read the structured result of a tool call in a client script.
